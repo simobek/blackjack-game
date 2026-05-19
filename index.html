@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack - Crow Edition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Blackjack</h1>
+        
+        <div id="setup-panel">
+            <label>
+                <input type="checkbox" id="infinite-deck"> Infinite Deck
+            </label>
+            <button onclick="startGame()">Start New Game</button>
+        </div>
+
+        <div id="game-area" class="hidden">
+            <div class="hand-section">
+                <h2>Dealer's Hand <span id="dealer-score"></span></h2>
+                <div id="dealer-cards" class="cards-container"></div>
+            </div>
+
+            <div class="hand-section">
+                <h2>Your Hand <span id="player-score"></span></h2>
+                <div id="player-cards" class="cards-container"></div>
+            </div>
+
+            <div id="controls">
+                <button onclick="hit()" id="btn-hit">Hit</button>
+                <button onclick="stand()" id="btn-stand">Stand</button>
+            </div>
+
+            <div id="message-area"></div>
+            <div id="recommendation-area"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
