@@ -7,6 +7,16 @@ A C++ blackjack game with two ways to play:
 
 The game supports finite multi-deck play, infinite-deck simulation, dealer play, hidden dealer cards, hand scoring with aces, and basic-strategy recommendations.
 
+I built this project to practice C++ game logic, backend routing with Crow, and the basics of turning a local C++ app into something that could later be deployed as a small web service.
+
+## Current Status
+
+- Console version: implemented
+- Local web version: implemented
+- REST API: implemented
+- Docker deployment: planned
+- AWS deployment: architecture designed, not deployed yet
+
 ## Features
 
 - Console and browser gameplay
@@ -164,9 +174,9 @@ GET /api/state
 
 Returns the current game state.
 
-## AWS Deployment Architecture
+## Possible AWS Deployment Plan
 
-The web version is a single C++ HTTP server that serves both the static frontend and JSON API. The simplest AWS deployment is to package the compiled server in a container and run it on Amazon ECS Fargate behind an Application Load Balancer.
+The web version is currently meant to run locally. For deployment, I would containerize the Crow server and run it on ECS Fargate behind an Application Load Balancer. The diagram below shows the direction I would take if I deploy the project on AWS.
 
 ![AWS deployment architecture for the Blackjack Game](assets/aws-deployment-architecture.png)
 
@@ -193,26 +203,25 @@ Blackjack C++ Crow container
 
 Supporting services:
 
-Amazon ECR          stores the Docker image
-Amazon CloudWatch   stores logs and metrics
-AWS IAM             controls task execution permissions
-Amazon VPC          isolates networking across public/private subnets
+Amazon ECR          keeps the Docker image
+Amazon CloudWatch   collects app logs
+AWS IAM             gives the ECS task the permissions it needs
+Amazon VPC          contains the load balancer and ECS tasks
 ```
 
-### Recommended AWS Components
+### AWS Services I Would Use
 
-- **Amazon ECR**: stores the Docker image for the C++ web server.
-- **Amazon ECS Fargate**: runs the container without managing EC2 instances.
-- **Application Load Balancer**: exposes the game over HTTP/HTTPS and forwards traffic to ECS.
-- **Route 53**: optional custom domain, such as `blackjack.example.com`.
-- **AWS Certificate Manager**: free TLS certificate for HTTPS.
-- **CloudWatch Logs**: centralized server logs.
-- **IAM Roles**: least-privilege permissions for pulling images and writing logs.
-- **VPC with subnets**: public subnets for the load balancer and private subnets for the ECS tasks.
+- **Amazon ECR**: to store the Docker image.
+- **Amazon ECS Fargate**: to run the Blackjack server as a container.
+- **Application Load Balancer**: to send browser/API traffic to the container.
+- **Route 53**: only if I add a custom domain later.
+- **AWS Certificate Manager**: only if I enable HTTPS with a custom domain.
+- **CloudWatch Logs**: to check server output and errors.
+- **IAM Roles**: so the ECS task can pull the image and write logs.
 
-### Deployment Structure
+### Future Deployment Structure
 
-A production-ready repository can be expanded like this:
+If I continue the AWS part, I would probably organize the repo like this:
 
 ```text
 .
@@ -245,9 +254,9 @@ A production-ready repository can be expanded like this:
 `-- build_web.bat
 ```
 
-The current repository is still simple and Windows-focused, so the deployment files above are a suggested structure rather than files that already exist.
+The current repository does not include these deployment folders yet. This is only the structure I would use when adding Docker and infrastructure files.
 
-### Container Deployment Flow
+### Planned Deployment Flow
 
 1. Build a Linux container image for the Crow server.
 2. Push the image to Amazon ECR.
@@ -286,14 +295,13 @@ CMD ["./web_blackjack"]
 
 For AWS, the container should listen on port `18080`, and the ECS target group should forward traffic to the same container port.
 
-### Security Notes
+### Deployment Notes
 
-- Use HTTPS at the load balancer with an ACM certificate.
-- Keep ECS tasks in private subnets when possible.
-- Allow inbound public traffic only to the load balancer.
-- Allow the ECS task security group to receive traffic only from the load balancer security group.
-- Store secrets in AWS Secrets Manager or SSM Parameter Store if future features need credentials.
-- Avoid committing AWS credentials or local `.env` files.
+- I would expose only the load balancer to the internet.
+- The ECS task would receive traffic from the load balancer on port `18080`.
+- If I add a domain, I would use HTTPS with an ACM certificate.
+- I would keep AWS credentials out of the repository.
+- This app does not currently need a database or object storage.
 
 ## Gameplay Notes
 
