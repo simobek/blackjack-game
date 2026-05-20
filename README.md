@@ -168,6 +168,8 @@ Returns the current game state.
 
 The web version is a single C++ HTTP server that serves both the static frontend and JSON API. The simplest AWS deployment is to package the compiled server in a container and run it on Amazon ECS Fargate behind an Application Load Balancer.
 
+![AWS deployment architecture for the Blackjack Game](assets/aws-deployment-architecture.png)
+
 ```text
 Users
   |
